@@ -1,0 +1,55 @@
+{% extends 'listings/base.html' %}
+{% block title %}채팅방{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white border border-gray-200 rounded-xl p-6">
+
+    <h2 class="text-xl font-semibold mb-4">
+        💬 {{ listing.title }} - 채팅방
+    </h2>
+
+    <div class="p-4 border rounded-lg h-80 overflow-y-auto bg-gray-50">
+        {% for msg in messages_list %}
+            <div class="mb-4">
+                <p class="text-xs text-gray-500">{{ msg.created_at|date:"Y-m-d H:i" }}</p>
+                <p class="font-semibold {% if msg.sender == user %}text-emerald-600{% else %}text-gray-700{% endif %}">
+                    {{ msg.sender.username }}
+                </p>
+                <p class="text-sm">{{ msg.message }}</p>
+            </div>
+        {% empty %}
+            <p class="text-gray-500 text-center mt-4">아직 메시지가 없습니다.</p>
+        {% endfor %}
+    </div>
+
+    <form method="post" class="mt-4 space-y-3">
+        {% csrf_token %}
+
+        {{ form.message }}
+
+        <button class="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700">
+            메시지 보내기
+        </button>
+
+        {% if user == listing.seller %}
+        <div class="mt-2">
+            <label class="text-sm font-semibold">판매 상태 변경</label>
+            <select name="status" class="mt-1">
+                <option value="">-- 변경 안 함 --</option>
+                {% for value, label in STATUS_CHOICES %}
+                    <option value="{{ value }}" {% if listing.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button class="w-full bg-gray-700 text-white py-2 rounded-lg mt-2 hover:bg-gray-800">
+                상태 업데이트
+            </button>
+        </div>
+        {% endif %}
+
+    </form>
+
+</div>
+{% endblock %}

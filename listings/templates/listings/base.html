@@ -1,0 +1,104 @@
+{% comment %}
+전체 레이아웃 공통 템플릿
+{% endcomment %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}마켓 플레이스{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* 🔹 모든 입력 필드 공통 스타일 (일정 크기 + 반투명) */
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"],
+        input[type="url"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;    /* gray-300 */
+            background-color: rgba(255, 255, 255, 0.7); /* 반투명 흰색 */
+            font-size: 0.875rem;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-gray-100">
+
+<header class="bg-cyan-100 shadow-md sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+
+        <!-- 로고 (M 아이콘 제거, 심플 텍스트) -->
+        <a href="{% url 'listings:listing_list' %}" class="text-2xl font-bold text-blue-700">
+            SHOP hs
+        </a>
+
+        <nav class="flex items-center space-x-5 text-sm">
+
+            {% if user.is_authenticated %}
+                <!-- 로그인 시에만 물품 등록 보이게 -->
+                <a href="{% url 'listings:listing_create' %}"
+                   class="px-3 py-1.5 rounded-full border border-emerald-500 text-emerald-700 hover:bg-emerald-50 font-medium">
+                    물품 등록
+                </a>
+
+                <a href="{% url 'listings:favorite_list' %}"
+                   class="text-gray-700 hover:text-emerald-600">
+                    즐겨찾기
+                </a>
+
+                <a href="{% url 'listings:chat_list' %}"
+                   class="text-gray-700 hover:text-emerald-600">
+                    채팅함
+                </a>
+
+                <a href="{% url 'listings:my_store' pk=user.pk %}"
+                   class="text-gray-700 hover:text-emerald-600">
+                    내 상점
+                </a>
+
+                <a href="{% url 'accounts:my_page' %}"
+                    class="text-gray-700 hover:text-emerald-600">
+                    마이페이지
+                </a>
+
+                <a href="{% url 'accounts:logout' %}" class="text-gray-500 hover:text-gray-700">
+                    로그아웃
+                </a>
+                
+
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="text-gray-700 hover:text-emerald-600">
+                    로그인
+                </a>
+                <a href="{% url 'accounts:signup' %}"
+                   class="bg-emerald-600 text-white px-3 py-1.5 rounded-full hover:bg-emerald-700 text-sm">
+                    회원가입
+                </a>
+            {% endif %}
+
+        </nav>
+    </div>
+</header>
+
+<main class="flex-grow max-w-6xl mx-auto w-full px-4 py-8">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-gray-900 text-white py-4 text-center text-xs">
+    &copy; 2025 데이터베이스 중고거래플랫폼
+</footer>
+
+</body>
+</html>

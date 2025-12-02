@@ -1,0 +1,29 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% extends 'listings/base.html' %}
+{% block title %}회원가입{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white/80 backdrop-blur p-8 rounded-xl shadow">
+
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-900">회원가입</h1>
+
+    <form method="POST" class="space-y-4">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button class="w-full bg-emerald-600 text-white py-3 rounded-xl mt-2 font-bold hover:bg-emerald-700">
+            가입하기
+        </button>
+    </form>
+
+    <p class="text-center mt-4 text-sm text-gray-500">
+        이미 계정이 있나요?
+        <a href="{% url 'accounts:login' %}" class="text-emerald-600 font-semibold">로그인</a>
+    </p>
+
+</div>
+{% endblock %}
+
+

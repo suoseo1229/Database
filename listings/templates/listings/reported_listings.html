@@ -1,0 +1,23 @@
+{% extends 'listings/base.html' %}
+{% block title %}신고된 게시글{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">신고된 게시글</h1>
+
+{% if listings %}
+<ul class="space-y-4">
+    {% for listing in listings %}
+        <li class="border p-4 rounded">
+            <h2 class="font-semibold text-lg">{{ listing.title }}</h2>
+            <p>작성자: {{ listing.seller.username }}</p>
+            <p>등록일: {{ listing.created_at }}</p>
+            <a href="{% url 'listings:listing_detail' listing.pk %}" class="text-blue-500 underline">상세 보기</a> |
+            <a href="{% url 'listings:listing_update' listing.pk %}" class="text-yellow-500 underline">수정</a> |
+            <a href="{% url 'listings:listing_delete' listing.pk %}" class="text-red-500 underline">삭제</a>
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>신고된 게시글이 없습니다.</p>
+{% endif %}
+{% endblock %}
