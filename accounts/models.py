@@ -8,7 +8,7 @@ class Profile(models.Model):
     birth = models.DateField(null=True, blank=True)
     phone = models.CharField(max_length=20)
     location = models.CharField(max_length=100)
-    nickname = models.CharField(max_length=30)
+    
 
     def __str__(self):
         self.user.username

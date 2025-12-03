@@ -9,11 +9,11 @@
 
     <form method="POST">
         {% csrf_token %}
-
+<!-- 수정 불가능-->
         <p><strong>아이디:</strong>{{user.username}}</p>
         <p><strong>이메일:</strong>{{user.email}}</p>
-
-        <p><strong>닉네임:</strong>{{profile_form.nickname}}</p>
+        <p><strong>학번:</strong>{{user.profile.number}}</p>
+<!--수정 가능-->
         <p><strong>전화번호 (000-0000-0000 형식 입력):</strong>{{profile_form.phone}}</p> 
         <p><strong>생년월일 (0000-00-00 형식 입력):</strong>{{profile_form.birth}}</p>
         <p><strong>거래희망장소:</strong>{{profile_form.location}}</p>

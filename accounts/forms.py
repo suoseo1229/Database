@@ -50,6 +50,7 @@ class ProfileUpdateForm(forms.ModelForm):
         input_formats=['%Y-%m-%d'],
         widget=forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD'})
     )
+
     class Meta:
         model = Profile 
         fields = ['number', 'birth', 'phone', 'location']
