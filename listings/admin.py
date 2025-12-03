@@ -1,7 +1,7 @@
 # listings/admin.py
 
 from django.contrib import admin
-from .models import Listing, Report
+from .models import Listing, Report, ChatRoom
 
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):
@@ -15,3 +15,8 @@ class ReportAdmin(admin.ModelAdmin):
     search_fields = ('reason',)
 
     # 신고된 게시글만 필터링하는 커스텀 뷰도 가능
+@admin.register(ChatRoom)
+class ChatRoomAdmin(admin.ModelAdmin):
+    list_display = ('listing', 'seller', 'buyer', 'is_closed', 'created_at')
+    list_filter = ('is_closed',)
+    search_fields = ('listing__title', 'seller__username', 'buyer__username')

@@ -49,6 +49,7 @@ class ChatRoom(models.Model):
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_rooms_as_buyer')
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_rooms_as_seller')
     created_at = models.DateTimeField(auto_now_add=True)
+    is_closed = models.BooleanField(default=False) #거래 완료 여부
 
     class Meta:
         unique_together = ('listing', 'buyer')

@@ -7,28 +7,34 @@ from .models import Profile
 
 
 class UserRegistrationForm(UserCreationForm):
-    nickname = forms.CharField(
+    number = forms.CharField(
         max_length=30,
-        required=False,
-        label="닉네임",
+        label="학번",
         widget=forms.TextInput(attrs={
-            "class": "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm",
-            "placeholder": "닉네임 (선택)",
-        }),
+            "class": "...",
+            "placeholder": "학번 (필수)"
+        })
     )
+
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ("email",)
-    
+
+    def clean_number(self):
+        number = self.cleaned_data.get("number")
+        if Profile.objects.filter(number=number).exists():
+            raise forms.ValidationError("이미 사용중인 학번입니다.")
+        return number
+
     def save(self, commit=True):
         user = super().save(commit)
-        nickname = self.cleaned_data.get("nickname")
+        number = self.cleaned_data.get("number")
+
         if commit:
-            profile, crated = Profile.objects.get_or_create(user=user)
-            if nickname:
-            # Profile은 시그널로 자동 생성되니까 가져와서 닉네임만 세팅
-                user.profile.nickname = nickname
-                user.profile.save()
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.number = number
+            profile.save()
+
         return user
     
 class ProfileUpdateForm(forms.ModelForm):
@@ -46,15 +52,8 @@ class ProfileUpdateForm(forms.ModelForm):
     )
     class Meta:
         model = Profile 
-        fields = ['nickname', 'birth', 'phone', 'location']
+        fields = ['number', 'birth', 'phone', 'location']
 
-    def clean_nickname(self):
-        nickname = self.cleaned_data.get('nickname')
-        user = self.instance.user 
-        if nickname:
-            if Profile.objects.exclude(user=user).filter(nickname=nickname).exists():
-                raise ValidationError('이미 사용중인 닉네임')
-            return nickname
                                 
 
 class PasswordChangeForm(PasswordChangeForm):

@@ -28,9 +28,6 @@ urlpatterns = [
     path("report/listing/<int:listing_pk>/", views.report_listing, name="report_listing"),
 
     path("chats/", views.chat_list, name="chat_list"),
-    #신고글 페이지
-    path("reports/listings/", views.reported_listings, name="reported_listings"),
-
 
     # 채팅 기능
     path("chat/<int:room_id>/", views.chat_room, name="chat_room"),

@@ -139,6 +139,8 @@ def chat_list(request):#채팅목록
 @login_required
 def chat_room(request, room_id):#채팅창
     room = get_object_or_404(ChatRoom, pk=room_id)
+    show_numbers = room.is_closed #거래완료시 학번공개
+    #참여자만 접근
     if request.user not in [room.buyer, room.seller]:
         return redirect('listings:chat_list')
 
@@ -157,7 +159,10 @@ def chat_room(request, room_id):#채팅창
             if status and request.user == room.seller:
                 room.listing.status = status
                 room.listing.save()
-
+                if status =='D':
+                    room.is_closed = True
+                    room.save()
+                    
             return redirect('listings:chat_room', room_id=room_id)
     else:
         form = ChatMessageForm()
@@ -168,6 +173,9 @@ def chat_room(request, room_id):#채팅창
         'messages_list': messages_list,
         'form': form,
         'STATUS_CHOICES': Listing.STATUS_CHOICES,
+        'show_numbers': show_numbers,
+        'seller': room.seller,
+        'buyer': room.buyer,
     })
 
 @login_required
@@ -186,12 +194,3 @@ def start_chat(request, listing_pk):#채팅 시작하기
 def my_page(request):
     return redirect('listing_list')
 
-@staff_member_required
-def reported_listings(request):
-    # 신고된 게시글 조회
-    reports = Report.objects.filter(reported_listing__isnull=False).select_related('reported_listing')
-    listings = set(report.reported_listing for report in reports)
-
-    return render(request, 'listings/reported_listings.html', {
-        'listings': listings
-    })

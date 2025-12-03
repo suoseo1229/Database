@@ -26,6 +26,12 @@
         {% csrf_token %}
 
         {{ form.message }}
+        {% if show_numbers %} <!--거래완료시 서로의 학번 표시 -->
+        <div class="bg-yellow-50 border rounded p-2 mb-4 text-sm text-gray-800">
+            <p><strong>{{ seller.username }}</strong>님의 학번: {{ seller.profile.number }}</p>
+            <p><strong>{{ buyer.username }}</strong>님의 학번: {{ buyer.profile.number }}</p>
+        </div>
+        {% endif %}        
 
         <button class="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700">
             메시지 보내기
