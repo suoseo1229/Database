@@ -1,0 +1,164 @@
+{% extends 'listings/base.html' %}
+{% block title %}{{ listing.title }} - 상세 보기{% endblock %}
+
+{% block content %}
+</div>
+<div class="max-w-5xl mx-auto bg-white border border-gray-200 rounded-xl p-6">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- 이미지 영역 -->
+        <div class="space-y-2 mb-6">
+            <div class="flex gap-4 overflow-x-auto">
+                {% if listing.image1 %}
+                    <img src="{{ listing.image1.url }}" class="h-72 rounded-lg object-cover shadow">
+                {% endif %}
+                {% if listing.image2 %}
+                    <img src="{{ listing.image2.url }}" class="h-72 rounded-lg object-cover shadow">
+                {% endif %}
+                {% if listing.image3 %}
+                    <img src="{{ listing.image3.url }}" class="h-72 rounded-lg object-cover shadow">
+                {% endif %}
+            </div>
+
+            {% if not listing.image1 and not listing.image2 and not listing.image3 %}
+                <div class="flex items-center justify-center w-full h-72 bg-gray-100 text-gray-500">
+                    등록된 이미지가 없습니다.
+                </div>
+            {% endif %}
+        </div>
+
+
+        <!-- 상세 정보 -->
+        <div class="flex flex-col justify-between">
+            <div>
+            <!-- 판매 상태 뱃지 -->
+            <div class="mt-4">
+                {% if listing.status == 'R' %}
+                    <span class="inline-block px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
+                        예약중
+                    </span> </div>
+                {% elif listing.status == 'D' %}
+                    <span class="inline-block px-3 py-1 text-xs rounded-full bg-red-100 text-red-600">
+                        거래완료
+                    </span>
+                {% else %}
+                    <span class="inline-block px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700">
+                        판매중
+                    </span>
+                {% endif %}            
+                <h1 class="text-2xl font-semibold text-gray-900 mb-2">
+                    {{ listing.title }}
+                </h1>
+
+                <p class="text-xl font-bold text-emerald-700 mb-3">
+                    {{ listing.price|floatformat:"0" }} 원
+                </p>
+
+                <p class="text-sm text-gray-600 mb-1">
+                    위치: {{ listing.location|default:"지역 미정" }}
+                </p>
+
+
+
+                {% if listing.seller %}
+                <p class="text-sm text-gray-600 mb-1">
+                    판매자:
+                    <a href="{% url 'listings:my_store' pk=listing.seller.pk %}"
+                       class="underline hover:text-gray-800">
+                        {{ listing.seller.username }}
+                    </a>
+                </p>
+                {%else %}
+                 <p class="text-sm text-gray-600 mb-1">
+                        판매자 정보 없음
+                    </p>
+                {% endif %}
+
+                <!-- 신고 -->
+                <div class="mt-3 flex items-center gap-2 text-xs">
+                    {% if has_reported %}
+                        <span class=""text-red-500 bg-red-50 px-3 py-1 rounded-full border border-red-200">
+                            이미 신고한 게시글입니다.
+                        </span>
+                    {% else %}
+                    <a href="{% url 'listings:report_listing' listing_pk=listing.pk %}"
+                       class="px-2 py-1 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                        이 물품 신고
+                    </a>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user != listing.seller %}
+                        {%if has_reported %}
+                            <span class=""text-red-500 bg-red-50 px-3 py-1 rounded-full border border-red-200">
+                                이미 신고한 사용자입니다.
+                            </span>
+                        {% else %}
+                            <a href="{% url 'listings:report_user' user_pk=listing.seller.pk %}"
+                                class="px-2 py-1 rounded-full border border-red-200 text-red-500 hover:bg-red-50">
+                                    판매자 신고
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <p class="text-xs text-gray-400 mt-3">
+                    등록일: {{ listing.created_at|date:"Y-m-d H:i" }}
+                </p>
+            </div>
+
+            <!-- 버튼 영역 -->
+            <div class="mt-6 space-y-3">
+
+                <!-- 내 글이 아닐 때만 찜 -->
+                {% if user != listing.seller %}
+                    <a href="{% url 'listings:toggle_favorite' pk=listing.pk %}"
+                       class="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2.5 text-sm hover:bg-gray-50">
+                        <span class="{% if is_favorited %}text-red-500{% else %}text-gray-400{% endif %} text-lg">
+                            {% if is_favorited %}❤️{% else %}♡{% endif %}
+                        </span>
+                        <span class="font-medium text-gray-700">
+                            {% if is_favorited %}찜 해제{% else %}찜하기{% endif %}
+                        </span>
+                    </a>
+                {% endif %}
+
+                <!-- 채팅 버튼 -->
+                {% if user.is_authenticated and listing.seller != user %}
+                    <a href="{% url 'listings:start_chat' listing.pk %}"
+                       class="w-full flex items-center justify-center gap-2 bg-emerald-500 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-emerald-600">
+                        💬 <span>판매자와 채팅하기</span>
+                    </a>
+                {% elif not user.is_authenticated %}
+                    <a href="{% url 'accounts:login' %}?next={% url 'listings:listing_detail' listing.pk %}"
+                       class="w-full flex items-center justify-center gap-2 bg-gray-800 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-gray-900">
+                        로그인 후 채팅하기
+                    </a>
+                {% endif %}
+
+                <!-- 판매자 본인용 수정/삭제 -->
+                {% if user == listing.seller %}
+                    <div class="flex gap-2">
+                        <a href="{% url 'listings:listing_update' listing.pk %}"
+                           class="flex-1 text-center border border-gray-300 rounded-lg py-2 text-sm hover:bg-gray-50">
+                            수정
+                        </a>
+                        <a href="{% url 'listings:listing_delete' listing.pk %}"
+                           class="flex-1 text-center border border-red-300 text-red-600 rounded-lg py-2 text-sm hover:bg-red-50">
+                            삭제
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세 설명 -->
+    <div class="mt-8 border-t border-gray-100 pt-4">
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">상세 설명</h2>
+        <p class="text-sm text-gray-700 whitespace-pre-wrap">
+            {{ listing.description }}
+        </p>
+    </div>
+</div>
+{% endblock %}

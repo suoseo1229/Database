@@ -1,0 +1,40 @@
+{% extends 'listings/base.html' %}
+{% block title %}채팅 목록{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">채팅 목록</h1>
+
+{% if rooms %}
+<div class="space-y-4">
+
+    {% for room in rooms %}
+    <a href="{% url 'listings:chat_room' room.id %}"
+       class="block bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition">
+
+        <div class="flex justify-between">
+            <div>
+                <p class="text-sm text-gray-500">
+                    {{ room.listing.title }}
+                </p>
+
+                {% if user == room.seller %}
+                    <p class="text-gray-800 text-sm">구매자: {{ room.buyer.username }}</p>
+                {% else %}
+                    <p class="text-gray-800 text-sm">판매자: {{ room.seller.username }}</p>
+                {% endif %}
+            </div>
+
+            <span class="text-xs text-gray-400">
+                {{ room.created_at|date:"Y-m-d" }}
+            </span>
+        </div>
+    </a>
+    {% endfor %}
+
+</div>
+{% else %}
+<p class="text-center text-gray-500 py-16">
+    진행 중인 채팅이 없습니다.
+</p>
+{% endif %}
+{% endblock %}

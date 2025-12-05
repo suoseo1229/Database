@@ -1,0 +1,128 @@
+{% extends 'listings/base.html' %}
+{% block title %}물품 목록{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-900 mb-6">중고 물품 둘러보기</h1>
+    <div class="border-t border-gray-400"></div>
+
+<form method="get" class="flex gap-2">
+    <p class = "text-lg w-full font-bold text-gray-700 mb-1">물품 검색</p>
+    <input type="text" name="query" value="{{ search_query|default_if_none:'' }}" placeholder="제목으로 검색"
+           class="p-2 border rounded-md text-sm">
+    <button type="submit"
+            class="bg-cyan-200 w-24 hover:bg-gray-700 text-black px-4 py-2 rounded-md text-sm">
+        검색
+    </button>
+</form>
+    <div class="border-t border-gray-400"></div>
+<form method="get" class="flex items-center gap-4">
+    <p class="text-lg w-full font-bold text-gray-700 mb-1">
+    카테고리
+    </p>
+    <!-- 카테고리 선택 -->
+    <select name="category" class="p-2 border rounded-md text-sm">
+        <option value="">카테고리 전체</option>
+        <option value="도서" {% if selected_category == '도서' %}selected{% endif %}>도서</option>
+        <option value="의류" {% if selected_category == '의류' %}selected{% endif %}>의류</option>
+        <option value="가구/인테리어" {% if selected_category == '가구/인테리어' %}selected{% endif %}>가구/인테리어</option>
+        <option value="디지털/가전" {% if selected_category == '디지털/가전' %}selected{% endif %}>디지털/가전</option>
+        <option value="기타" {% if selected_category == '기타' %}selected{% endif %}>기타</option>
+    </select>
+    <!-- 상태 선택 -->
+    <select name="status" class="mt-1 p-2 border rounded-md text-sm">
+        <option value="">판매 상태 전체</option>
+        <option value="S" {% if selected_status == 'S' %}selected{% endif %}>판매중</option>
+        <option value="R" {% if selected_status == 'R' %}selected{% endif %}>예약중</option>
+        <option value="D" {% if selected_status == 'D' %}selected{% endif %}>거래완료</option>
+    </select>
+
+    <button type="submit" class="mt-1 w-80 px-4 py-2 bg-cyan-200 text-black rounded-md hover:bg-blue-300 text-sm">
+        필터 적용
+    </button>
+</form>
+    <div class="border-t border-gray-400 pt-4">
+    </div>
+
+{% if listings %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for listing in listings %}
+    <div class="relative bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden border border-gray-100">
+
+        {# 내 글일 때만 점 3개 메뉴 #}
+        {% if user.is_authenticated and user == listing.seller %}
+        <div class="absolute top-2 right-2 z-10">
+            <details class="relative">
+                <summary class="list-none cursor-pointer p-1 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-ellipsis-v text-gray-500 text-sm"></i>
+                </summary>
+                <div class="absolute right-0 mt-1 w-24 bg-white border border-gray-200 rounded-lg shadow text-xs">
+                    <a href="{% url 'listings:listing_update' listing.pk %}"
+                       class="block px-3 py-2 hover:bg-gray-50">
+                        수정
+                    </a>
+                    <a href="{% url 'listings:listing_delete' listing.pk %}"
+                       class="block px-3 py-2 text-red-500 hover:bg-red-50">
+                        삭제
+                    </a>
+                </div>
+            </details>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'listings:listing_detail' listing.pk %}" class="block">
+
+            <div class="w-full h-48 bg-gray-100 overflow-hidden">
+                {% if listing.image1 %}
+                    <img src="{{ listing.image1.url }}" class="w-full h-full object-cover">
+                {% elif listing.image_url %}
+                    <img src="{{ listing.image_url }}" class="w-full h-full object-cover">
+                {% else %}
+                    <img src="https://placehold.co/400x300/e5e7eb/6b7280?text={{ listing.title|urlencode }}"
+                         class="w-full h-full object-cover">
+                {% endif %}
+            </div>
+
+            <div class="p-4">
+                <div class="flex items-start justify-between gap-2 mb-1">
+                    <h2 class="text-sm font-semibold text-gray-900 line-clamp-2">
+                        {{ listing.title }} 
+                        <span class="px-2 py-0.5 text-[11px] rounded-full bg-black-100 text-yellow-700">
+                            {{ listing.category }}
+                        </span>
+                    </h2>
+
+                    {% if listing.status == 'R' %}
+                        <span class="px-2 py-0.5 text-[11px] rounded-full bg-yellow-100 text-yellow-700">
+                            예약중
+                        </span>
+                    {% elif listing.status == 'D' %}
+                        <span class="px-2 py-0.5 text-[11px] rounded-full bg-red-100 text-red-600">
+                            거래완료
+                        </span>
+                    {% else %}
+                        <span class="px-2 py-0.5 text-[11px] rounded-full bg-emerald-100 text-emerald-700">
+                            판매중
+                        </span>
+                    {% endif %}
+                </div>
+
+                <p class="text-lg font-bold text-emerald-700 mb-1">
+                    {{ listing.price|floatformat:"0" }} 원
+                </p>
+
+                <p class="text-xs text-gray-500 mb-1">
+                    거래장소 | {{ listing.location|default:"지역 미정" }}
+                </p>
+
+                <p class="text-[11px] text-gray-400">
+                    {{ listing.created_at|date:"Y-m-d h:m" }}
+                </p>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center text-gray-500 py-16">등록된 물품이 없습니다.</p>
+{% endif %}
+{% endblock %}

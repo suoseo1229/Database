@@ -1,0 +1,40 @@
+{% extends 'listings/base.html' %}
+{% block title %}찜 목록{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-900 mb-6">내 찜 목록</h1>
+
+{% if favorites %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for fav in favorites %}
+        {% with listing=fav.listing %}
+        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+
+            <a href="{% url 'listings:listing_detail' listing.pk %}">
+                {% if listing.image1 %}
+                    <img src="{{ listing.image1.url }}" class="w-full h-44 object-cover" />
+                {% else %}
+                    <img src="https://placehold.co/400x300/e5e7eb/6b7280?text={{ listing.title }}" class="w-full h-44 object-cover">
+                {% endif %}
+            </a>
+
+            <div class="p-4">
+                <h2 class="font-semibold text-gray-900 line-clamp-1">{{ listing.title }}</h2>
+                <p class="text-emerald-700 font-bold">{{ listing.price }} 원</p>
+
+                <p class="text-xs text-gray-500 mt-1">
+                    {{ listing.location|default:"지역 미정" }}
+                </p>
+
+                <p class="text-[11px] text-gray-400 mt-2">
+                    찜한 날짜: {{ fav.created_at|date:"Y-m-d" }}
+                </p>
+            </div>
+        </div>
+        {% endwith %}
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center text-gray-500 py-16">찜한 물품이 없습니다.</p>
+{% endif %}
+{% endblock %}
